@@ -1,0 +1,6 @@
+pytest
+requests
+flask
+flask-sqlalchemy
+flask-admin
+python-dateutil

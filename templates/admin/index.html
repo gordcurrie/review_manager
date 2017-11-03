@@ -1,0 +1,64 @@
+{% extends 'admin/master.html' %}
+{% block head_tail %}
+  {{ super() }}
+  <link href="{{ url_for('static', filename='cusom.css') }}" rel="stylesheet">
+{% endblock %}
+{% block body %}
+{{ super() }}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-10 col-sm-offset-1">
+            <h1>Review Manager</h1>
+            <p>
+                Application for managing app Reviews
+            </p>
+            <div class="refreshContainer">
+                <button class="btn btn-primary refresh-reviews" href="">Refresh Reviews</button>
+                <div id="loader"></div>
+                <div id="updateInfo"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var button = document.querySelector('.refresh-reviews');
+    var container = document.querySelector('.refreshContainer');
+    var loader = document.getElementById('loader');
+    var updateInfo = document.getElementById('updateInfo')
+    if (button) {
+        button.addEventListener('click', function() {
+            this.classList.remove('btn-primary');
+            this.classList.add('btn-warning');
+            loader.innerHTML = "Loading";
+            loader.classList.add('loading');
+            updateInfo.innerHTML = "";
+            makeAjaxRequest();
+            this.disabled = true;
+        }, false);
+    }
+
+    function makeAjaxRequest() {
+        console.log("making request");
+        var httpRequest = new XMLHttpRequest();
+        httpRequest.onreadystatechange = function() {
+            if (httpRequest.readyState === XMLHttpRequest.DONE && httpRequest.status === 200) {
+                try {
+                    console.log("recieved response");
+                    var button = document.querySelector('.refresh-reviews');
+                    button.classList.remove('btn-warning');
+                    button.classList.add('btn-primary');
+                    loader.innerHTML = "";
+                    loader.classList.remove('loading');
+                    button.disabled = false;
+                } catch(err) {
+                    console.log(err.message + " in " + httpRequest.responseText);
+                    return;
+                }
+            }
+        };
+        httpRequest.open("GET", "{{ url_for('refresh_reviews') }}", true);
+        httpRequest.send();
+    }
+</script>
+{% endblock body %}
